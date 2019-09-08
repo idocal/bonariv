@@ -7,29 +7,13 @@ const port = process.env.PORT || 5000;
 const uuid = require('uuid');
 const short = require('short-uuid');
 const bodyParser = require('body-parser');
-const EventEmitter = require('events');
 
-class FoundMatchEmitter extends EventEmitter {}
-const foundMatchEmitter = new FoundMatchEmitter();
+const qRight = [];
+const qLeft = [];
 
-// parse application/json
-app.use(bodyParser.json());
+const activeConnections = {};
 
-let qRight = [];
-let qLeft = [];
-
-let activeConnections = {};
-
-// When found a match, emit to user
-foundMatchEmitter.on('found', (match) => {
-    console.log('match:', match);
-    console.log('activeconnn', match, Object.keys(activeConnections).length)
-    activeConnections[match.right.userId].emit('partner', { convId: match.convId, partnerId: match.left.userId, partnerName: match.left.name });
-    activeConnections[match.left.userId].emit('partner', { convId: match.convId, partnerId: match.right.userId, partnerName: match.right.name });
-});
-
-// Add a new user to the queue
-const lookForPartner = (socket, userId, wing, name) => {
+const lookForPartner = (userId, wing, name) => {
     console.log('new user looking for partner');
     const isLeft = wing !== 'right'
     const queueForSearch = isLeft ? qRight : qLeft;
@@ -44,10 +28,12 @@ const lookForPartner = (socket, userId, wing, name) => {
     console.log('Found match!');
     const convId = short.generate();
     const matchedUser = queueForSearch.pop();
-    const right = isLeft ? matchedUser : {userId, name};
-    const left = isLeft ? {userId, name} : matchedUser;
-    // TODO: Individual event emits
-    foundMatchEmitter.emit('found', {convId, right, left});
+
+    activeConnections[matchedUser.userId].emit('partner', { convId, partnerId: userId, partnerName: name });
+    activeConnections[userId].emit('partner', { convId, partnerId: matchedUser.userId, partnerName: matchedUser.name });
+
+    activeConnections[matchedUser.userId].activePartnerId = userId;
+    activeConnections[userId].activePartnerId = matchedUser.userId;
 };
 
 // Manage socket connections
@@ -62,7 +48,7 @@ io.on('connection', function(socket){
         activeConnections[userId] = socket;
         console.log('Active connections now after req_partner:', Object.keys(activeConnections).length);
         console.log(`Requesting partner for userId: ${userId}, ${wing}, ${name}`);
-        lookForPartner(socket, userId, wing, name);
+        lookForPartner(userId, wing, name);
     });
 
     socket.on('newMessage', function(data) {
@@ -80,13 +66,18 @@ io.on('connection', function(socket){
     // Disconnect
     socket.on('disconnect', function() {
         if (socket.userId && activeConnections[socket.userId]) {
+            const { activePartnerId } = activeConnections[socket.userId];
+            if (activePartnerId && activeConnections[activePartnerId]) {
+                activeConnections[activePartnerId].emit('partnerDisconnect', {});
+            }
             delete activeConnections[socket.userId];
         }
         console.log('disconnected userId:', socket.userId);
     });
 });
 
-// Manage user first entry
+app.use(bodyParser.json());
+
 app.get('/ping', (req, res) => {
     // Cookie handler
     if (req.headers.cookie) {
