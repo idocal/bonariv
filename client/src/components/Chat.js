@@ -12,7 +12,7 @@ export default class Chat extends Component {
         loading: true,
         convId: "",
         partnerId: "",
-        partnerName: "Itzik",
+        partnerName: "",
         socket: {}
     };
 
@@ -22,15 +22,34 @@ export default class Chat extends Component {
     }
 
     componentDidMount() {
-        this.state.socket.on('partner', match => {
-            this.setState({
-                loading: false,
-                convId: match.convId,
-                partnerName: match.partnerName,
-                partnerId: match.partnerId,
+        let p = this.props.location.state;
+        let isValid = (!!p && !!p.name && !!p.wing && !!p.userId);
+        if (isValid) {
+            // Found match
+            this.state.socket.on('partner', match => {
+                this.setState({
+                    loading: false,
+                    convId: match.convId,
+                    partnerName: match.partnerName,
+                    partnerId: match.partnerId,
+                });
             });
-        });
-        this.getChatPartner()
+
+            // Partner disconnected - back to lobby
+            this.state.socket.on('partnerDisconnect', () => {
+                this.setState({
+                    loading: true,
+                    convId: "",
+                    partnerId: "",
+                    partnerName: "",
+                });
+                this.getChatPartner();
+            });
+
+            this.getChatPartner()
+        } else {
+            this.props.history.push("/");
+        }
     }
 
     getChatPartner() {
@@ -39,20 +58,27 @@ export default class Chat extends Component {
     }
 
     render() {
-        return (
-            <FlexView className="chat" column hAlignContent="center" vAlignContent="center">
-                { !!this.state.loading && (<Loading wing={this.props.location.state.wing} />) }
-                {
-                    !this.state.loading &&  (
-                        <ChatWindow
-                            user={this.props.location.state.name}
-                            partnerName={this.state.partnerName}
-                            partnerId={this.state.partnerId}
-                            socket={this.state.socket}
-                        />
-                    )
-                }
-            </FlexView>
-        )
+        let p = this.props.location.state;
+        let isValid = (!!p && !!p.name && !!p.wing && !!p.userId);
+        if (isValid) {
+            return (
+                <FlexView className="chat" column hAlignContent="center" vAlignContent="center">
+                    { !!this.state.loading && (<Loading wing={this.props.location.state.wing} />) }
+                    {
+                        !this.state.loading &&  (
+                            <ChatWindow
+                                user={this.props.location.state.name}
+                                partnerName={this.state.partnerName}
+                                partnerId={this.state.partnerId}
+                                socket={this.state.socket}
+                            />
+                        )
+                    }
+                </FlexView>
+            )
+        } else {
+            return null
+        }
+
     }
 }

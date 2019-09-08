@@ -41,9 +41,7 @@ export default class ChatWindow extends Component {
 
     componentDidMount() {
         let socket = this.props.socket;
-        console.log('init socket handler', socket)
         socket.on('newMessage', async message => {
-            console.log('get MSG', message)
             await this.handleIncoming(message);
         });
     }
