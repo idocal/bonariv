@@ -22,8 +22,8 @@ let activeConnections = {};
 // When found a match, emit to user
 foundMatchEmitter.on('found', (match) => {
     console.log('match:', match);
-    activeConnections[match.right.userId].emit('partner', match);
-    activeConnections[match.left.userId].emit('partner', match);
+    activeConnections[match.right.userId].emit('partner', { convId: match.convId, partnerId: match.left.userId, partnerName: match.left.name });
+    activeConnections[match.left.userId].emit('partner', { convId: match.convId, partnerId: match.right.userId, partnerName: match.right.name });
 });
 
 // Add a new user to the queue
