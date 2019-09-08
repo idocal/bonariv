@@ -1,0 +1,29 @@
+body {
+  direction: rtl;
+}
+
+#root {
+  height: 100%;
+}
+
+.app {
+  height: 100%;
+}
+
+.ui.input>input {
+  text-align: right;
+}
+
+.your-name-tag {
+  margin-bottom: 20px;
+}
+
+.your-name-tag h1 {
+  font-size: 32px;
+  margin: 0;
+}
+
+.your-name-tag h2 {
+  font-size: 16px;
+  margin: 0;
+}
