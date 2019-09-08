@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
 import { Input, Button } from 'semantic-ui-react'
 import FlexView from "react-flexview";
+import { nicknames } from "../config";
 
-const randomNames = ["ציפי", "ביבי", "בוגי"];
+const randomNames = wing => {
+    if (wing === 'right') {
+        return nicknames.right;
+    } else {
+        return nicknames.left;
+    }
+};
 const yourNameTag = "השם שלך: ";
 
 export default class Setup extends Component {
@@ -23,7 +30,8 @@ export default class Setup extends Component {
     }
 
     async handleRandomNameButton() {
-        let rand = randomNames[Math.floor(Math.random() * randomNames.length)];
+        let names = randomNames(this.state.wing);
+        let rand = names[Math.floor(Math.random() * names.length)];
         await this.setState({
             name: rand,
             inputValue: ""
