@@ -22,8 +22,8 @@ let activeConnections = {};
 // When found a match, emit to user
 foundMatchEmitter.on('found', (match) => {
     console.log('match:', match);
-    activeConnections[match.right.id].emit('partner', match);
-    activeConnections[match.left.id].emit('partner', match);
+    activeConnections[match.right.userId].emit('partner', match);
+    activeConnections[match.left.userId].emit('partner', match);
 });
 
 // Add a new user to the queue
@@ -58,7 +58,7 @@ io.on('connection', function(socket){
         socket.userId = userId;
         activeConnections[userId] = socket;
         console.log('Active connections now after req_partner:', Object.keys(activeConnections).length);
-        console.log(`Requesting partner for userId: ${userId, wing, name}`);
+        console.log(`Requesting partner for userId: ${userId}, ${wing}, ${name}`);
         lookForPartner(socket, userId, wing, name);
     });
 
