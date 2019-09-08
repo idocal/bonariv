@@ -70,7 +70,7 @@ export default class ChatWindow extends Component {
                 currentMessage: ""
             }
         });
-        this.props.socket.emit('newMessage', {content, time, to})
+        this.props.socket.emit('newMessage', {content, time: time.format(), to})
     }
 
     async handleIncoming(incMsg) {
@@ -78,7 +78,7 @@ export default class ChatWindow extends Component {
             let messages = prevState.messages;
             let message = {
                 content: incMsg.content,
-                time: incMsg.content,
+                time: moment(incMsg.time),
                 local: false
             };
             messages.push(message);
@@ -92,7 +92,7 @@ export default class ChatWindow extends Component {
                 <FlexView className="messages" column>
                     {
                         this.state.messages.map((message, i) => {
-                            let userName = message.local ? "חיים" : "משה";
+                            let userName = message.local ? this.props.user : this.props.partnerName;
                             return (
                                 <Message content={message.content}
                                          user={userName}

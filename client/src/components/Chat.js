@@ -26,6 +26,8 @@ export default class Chat extends Component {
             this.setState({
                 loading: false,
                 convId: match.convId,
+                partnerName: match.partnerName,
+                partnerId: match.partnerId,
             });
         });
         this.getChatPartner()
@@ -45,7 +47,7 @@ export default class Chat extends Component {
                         <ChatWindow
                             user={this.props.location.state.name}
                             partnerName={this.state.partnerName}
-                            partnerId={this.state.partnerName}
+                            partnerId={this.state.partnerId}
                             socket={this.state.socket}
                         />
                     )
