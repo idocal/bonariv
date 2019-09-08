@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 let qRight = [];
 let qLeft = [];
 
-let activeConnections = [];
+let activeConnections = {};
 
 // Continuously match partners
 setInterval(() => {
@@ -33,15 +33,9 @@ setInterval(() => {
 
 // When found a match, emit to user
 foundMatchEmitter.on('found', (match) => {
-    let connections = activeConnections.map(c => c.userId);
-    const rightIndex = connections.indexOf(match.right.id);
-    const leftIndex = connections.indexOf(match.left.id);
-    console.log('match connections:', connections);
     console.log('match:', match);
-    console.log('right:', rightIndex);
-    console.log('left:', leftIndex);
-    activeConnections[rightIndex].socket.emit('partner', match);
-    activeConnections[leftIndex].socket.emit('partner', match);
+    activeConnections[match.right.id].emit('partner', match);
+    activeConnections[match.left.id].emit('partner', match);
 });
 
 // Add a new user to the queue
@@ -59,23 +53,31 @@ io.on('connection', function(socket){
 
     // Look for a partner
     socket.on('req_partner', function(data) {
-        let reqId = data.userId;
-        let reqWing = data.wing;
-        let reqName = data.name;
-        activeConnections.push({ userId: reqId, socket: socket, socketId: socket.id });
-        console.log('connections now:', activeConnections.map(c => c.socketId));
-        console.log('requesting partner...');
-        lookForPartner(socket, reqId, reqWing, reqName);
+        const { userId, wing, name } = data;
+        socket.userId = userId;
+        activeConnections[userId] = socket;
+        console.log('Active connections now after req_partner:', Object.keys(activeConnections).length);
+        console.log(`Requesting partner for userId: ${userId, wing, name}`);
+        lookForPartner(socket, userId, wing, name);
     });
+
+    socket.on('newMessage', function(data) {
+        const { content, time, to } = data;
+        if (!activeConnections[to] || !activeConnections[to].emit) {
+            console.log('Try to connect dead user');
+            // Think about what we want to do here
+            return;
+        }
+        activeConnections[to].emit('newMessage', { content, time, from: socket.userId });
+    });
+    
 
     // Disconnect
     socket.on('disconnect', function() {
-        let index = activeConnections.map(c => c.socketId).indexOf(socket.id);
-        if (index > -1) {
-            activeConnections.splice(index, 1)
+        if (socket.userId && activeConnections[socket.userId]) {
+            delete activeConnections[socket.userId];
         }
-        console.log('disconnected');
-        console.log('connections now:', activeConnections.map(c => c.socketId));
+        console.log('disconnected userId:', socket.userId);
     });
 });
 
