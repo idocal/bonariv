@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
@@ -85,10 +86,6 @@ io.on('connection', function(socket){
     });
 });
 
-http.listen(port, function(){
-    console.log(`listening on port ${port}`);
-});
-
 // Manage user first entry
 app.get('/ping', (req, res) => {
     // Cookie handler
@@ -110,3 +107,13 @@ app.get('/ping', (req, res) => {
     // Create userId and return
     res.send({"success": true, "userId": short.generate()});
 });
+
+app.use(express.static(path.join(__dirname, 'client', 'build')));
+
+if (module === require.main) {
+    const PORT = process.env.PORT || 8080;
+    http.listen(PORT, () => {
+        console.log(`App listening on port ${PORT}`);
+        console.log('Press Ctrl+C to quit.');
+    });
+}
