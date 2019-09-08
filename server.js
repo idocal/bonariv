@@ -17,9 +17,10 @@ app.use(bodyParser.json());
 let qRight = [];
 let qLeft = [];
 
+let activeConnections = [];
+
 // Continuously match partners
 setInterval(() => {
-    console.log('looking for matches');
     if (!!qRight.length && !!qLeft.length) {
         console.log('Found match!');
         let convId = short.generate();
@@ -30,30 +31,51 @@ setInterval(() => {
     }
 }, 1000);
 
+// When found a match, emit to user
+foundMatchEmitter.on('found', (match) => {
+    let connections = activeConnections.map(c => c.userId);
+    const rightIndex = connections.indexOf(match.right.id);
+    const leftIndex = connections.indexOf(match.left.id);
+    console.log('match connections:', connections);
+    console.log('match:', match);
+    console.log('right:', rightIndex);
+    console.log('left:', leftIndex);
+    activeConnections[rightIndex].socket.emit('partner', match);
+    activeConnections[leftIndex].socket.emit('partner', match);
+});
+
+// Add a new user to the queue
 const lookForPartner = (socket, id, wing, name) => {
     console.log('new user looking for partner');
     let q = wing === 'right' ? qRight : qLeft;
     q.push({id, name});
     console.log("Right:", qRight);
     console.log("Left:", qLeft);
-    foundMatchEmitter.on('found', (match) => {
-        if (match[wing].id === id ) {
-            socket.emit('partner', match);
-        }
-    });
 };
 
+// Manage socket connections
 io.on('connection', function(socket){
     console.log('a user connected');
+
+    // Look for a partner
     socket.on('req_partner', function(data) {
         let reqId = data.userId;
         let reqWing = data.wing;
         let reqName = data.name;
+        activeConnections.push({ userId: reqId, socket: socket, socketId: socket.id });
+        console.log('connections now:', activeConnections.map(c => c.socketId));
         console.log('requesting partner...');
         lookForPartner(socket, reqId, reqWing, reqName);
     });
+
+    // Disconnect
     socket.on('disconnect', function() {
+        let index = activeConnections.map(c => c.socketId).indexOf(socket.id);
+        if (index > -1) {
+            activeConnections.splice(index, 1)
+        }
         console.log('disconnected');
+        console.log('connections now:', activeConnections.map(c => c.socketId));
     });
 });
 

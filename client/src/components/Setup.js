@@ -38,7 +38,6 @@ export default class Setup extends Component {
     }
 
     async handleNameButton() {
-        console.log('pushing button:', this.props.userId);
         this.props.history.push('/chat', {
             name: this.state.name,
             wing: this.state.wing,

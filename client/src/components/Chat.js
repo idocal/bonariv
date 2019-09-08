@@ -1,10 +1,10 @@
-import { Widget } from 'react-chat-widget';
 import 'react-chat-widget/lib/styles.css';
 import React, { Component } from 'react';
 import FlexView from "react-flexview/";
 import '../style/Chat.css';
 import Loading from './Loading';
 import socketIOClient from "socket.io-client";
+import ChatWindow from "./ChatWindow";
 
 const socket = socketIOClient("/");
 
@@ -13,7 +13,7 @@ export default class Chat extends Component {
         loading: true,
         convId: "",
         partnerId: "",
-        partnerName: "",
+        partnerName: "Itzik",
     };
 
     componentDidMount() {
@@ -27,17 +27,19 @@ export default class Chat extends Component {
     }
 
     getChatPartner() {
-        let wings = ['left', 'right'];
-        let wing = wings[Math.floor(Math.random() * wings.length)];
-        socket.emit('req_partner', { userId: 'user-30', wing: wing, name: 'Itzik' });
+        let props = this.props.location.state;
+        socket.emit('req_partner', { userId: props.userId, wing: props.wing, name: props.name });
     }
 
     render() {
         return (
-            <FlexView className="chat" column>
-                {/*{ !!this.state.loading && (<Loading wing={this.props.wing} />) }*/}
-                {/*{ !this.state.loading && (<Widget />)}*/}
-                { console.log(this.props.location.state) }
+            <FlexView className="chat" column hAlignContent="center" vAlignContent="center">
+                { !!this.state.loading && (<Loading wing={this.props.location.state.wing} />) }
+                {
+                    !this.state.loading &&  (
+                        <ChatWindow user={this.props.location.state.name} partner={this.state.partnerName} />
+                    )
+                }
             </FlexView>
         )
     }
