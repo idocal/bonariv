@@ -18,7 +18,7 @@ export default class Chat extends Component {
 
     constructor(props) {
         super(props);
-        this.state.socket = socketIOClient('http://localhost:5000');
+        this.state.socket = socketIOClient('http://192.168.1.100:5000');
     }
 
     componentDidMount() {
