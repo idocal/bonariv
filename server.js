@@ -22,6 +22,7 @@ let activeConnections = {};
 // When found a match, emit to user
 foundMatchEmitter.on('found', (match) => {
     console.log('match:', match);
+    console.log('activeconnn', match, Object.keys(activeConnections).length)
     activeConnections[match.right.userId].emit('partner', { convId: match.convId, partnerId: match.left.userId, partnerName: match.left.name });
     activeConnections[match.left.userId].emit('partner', { convId: match.convId, partnerId: match.right.userId, partnerName: match.right.name });
 });
@@ -54,6 +55,7 @@ io.on('connection', function(socket){
 
     // Look for a partner
     socket.on('req_partner', function(data) {
+        console.log('data', data)
         const { userId, wing, name } = data;
         socket.userId = userId;
         activeConnections[userId] = socket;
@@ -64,6 +66,7 @@ io.on('connection', function(socket){
 
     socket.on('newMessage', function(data) {
         const { content, time, to } = data;
+        console.log('newMessage', data)
         if (!activeConnections[to] || !activeConnections[to].emit) {
             console.log('Try to connect dead user');
             // Think about what we want to do here
