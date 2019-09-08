@@ -6,7 +6,7 @@ import moment from 'moment';
 
 function Message(props) {
     return (
-        <FlexView className="message" column>
+        <div className="message">
             <FlexView className="sender" vAlignContent="center">
                 <FlexView className="user" vAlignContent="center">
                     { props.user }
@@ -21,7 +21,7 @@ function Message(props) {
                 </span>
 
             </FlexView>
-        </FlexView>
+        </div>
     )
 }
 
@@ -112,7 +112,7 @@ export default class ChatWindow extends Component {
                         />
                     </FlexView>
                     <FlexView>
-                        <Button color="red" onClick={this.handleSend}>שלח</Button>
+                        <Button color="red" onClick={this.handleSend} disabled={!this.state.currentMessage.length}>שלח</Button>
                     </FlexView>
                 </FlexView>
             </FlexView>

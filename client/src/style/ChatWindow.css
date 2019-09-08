@@ -14,6 +14,7 @@
 
 .messages {
     height: calc(100% - 50px);
+    overflow-y: auto;
 }
 
 .type-message {
@@ -31,8 +32,9 @@
 }
 
 .message {
-    padding: 10px 10px 0 10px;
+    padding: 5px 10px 5px 10px;
     color: #6E7379;
+    height: 50px;
 }
 
 .message .sender {
