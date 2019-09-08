@@ -19,18 +19,6 @@ let qLeft = [];
 
 let activeConnections = {};
 
-// Continuously match partners
-setInterval(() => {
-    if (!!qRight.length && !!qLeft.length) {
-        console.log('Found match!');
-        let convId = short.generate();
-        let right = qRight.pop();
-        let left = qLeft.pop();
-        // TODO: Individual event emits
-        foundMatchEmitter.emit('found', {convId, right, left});
-    }
-}, 1000);
-
 // When found a match, emit to user
 foundMatchEmitter.on('found', (match) => {
     console.log('match:', match);
@@ -39,12 +27,25 @@ foundMatchEmitter.on('found', (match) => {
 });
 
 // Add a new user to the queue
-const lookForPartner = (socket, id, wing, name) => {
+const lookForPartner = (socket, userId, wing, name) => {
     console.log('new user looking for partner');
-    let q = wing === 'right' ? qRight : qLeft;
-    q.push({id, name});
-    console.log("Right:", qRight);
-    console.log("Left:", qLeft);
+    const isLeft = wing !== 'right'
+    const queueForSearch = isLeft ? qRight : qLeft;
+    const queueForStandBy = !isLeft ? qRight : qLeft;
+
+
+    if (!queueForSearch.length) {
+        console.log(`Dont have any partner for userId: ${userId}, write to queue: ${wing}`)
+        queueForStandBy.push({userId, name});
+        return;
+    }
+    console.log('Found match!');
+    const convId = short.generate();
+    const matchedUser = queueForSearch.pop();
+    const right = isLeft ? matchedUser : {userId, name};
+    const left = isLeft ? {userId, name} : matchedUser;
+    // TODO: Individual event emits
+    foundMatchEmitter.emit('found', {convId, right, left});
 };
 
 // Manage socket connections
