@@ -32,7 +32,7 @@
 
 .message {
     padding: 10px 10px 0 10px;
-    color: #B2B9C1;
+    color: #6E7379;
 }
 
 .message .sender {
@@ -43,4 +43,8 @@
     margin-left: 10px;
     font-weight: 700;
     color: #505862;
+}
+
+.message .sender .time {
+    color: #B2B9C1;
 }

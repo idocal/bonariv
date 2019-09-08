@@ -6,7 +6,6 @@ import Loading from './Loading';
 import socketIOClient from "socket.io-client";
 import ChatWindow from "./ChatWindow";
 
-const socket = socketIOClient("/");
 
 export default class Chat extends Component {
     state = {
@@ -14,10 +13,16 @@ export default class Chat extends Component {
         convId: "",
         partnerId: "",
         partnerName: "Itzik",
+        socket: {}
     };
 
+    constructor(props) {
+        super(props);
+        this.state.socket = socketIOClient("/");
+    }
+
     componentDidMount() {
-        socket.on('partner', match => {
+        this.state.socket.on('partner', match => {
             this.setState({
                 loading: false,
                 convId: match.convId,
@@ -28,7 +33,7 @@ export default class Chat extends Component {
 
     getChatPartner() {
         let props = this.props.location.state;
-        socket.emit('req_partner', { userId: props.userId, wing: props.wing, name: props.name });
+        this.state.socket.emit('req_partner', { userId: props.userId, wing: props.wing, name: props.name });
     }
 
     render() {
@@ -37,7 +42,12 @@ export default class Chat extends Component {
                 { !!this.state.loading && (<Loading wing={this.props.location.state.wing} />) }
                 {
                     !this.state.loading &&  (
-                        <ChatWindow user={this.props.location.state.name} partner={this.state.partnerName} />
+                        <ChatWindow
+                            user={this.props.location.state.name}
+                            partnerName={this.state.partnerName}
+                            partnerId={this.state.partnerName}
+                            socket={this.state.socket}
+                        />
                     )
                 }
             </FlexView>
