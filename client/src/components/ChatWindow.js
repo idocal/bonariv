@@ -9,7 +9,11 @@ function Message(props) {
         <div className="message">
             <FlexView>
                 <div className="pic">
-                    <img src={"/avatars/" + props.avatar + ".png"} alt={props.avatar} />
+                    {
+                        props.avatar !== undefined ?
+                            (<img src={"/avatars/" + props.avatar + ".png"} alt={props.avatar} />) :
+                            (<img src={"/avatars/default.png"} alt={props.user} />)
+                    }
                 </div>
 
                 <FlexView column>
