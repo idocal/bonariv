@@ -237,6 +237,7 @@ export default class ChatWindow extends Component {
                                    value={this.state.currentMessage}
                                    onChange={this.handleType}
                                    onKeyDown={this.keyPress}
+                                   maxLength="150"
                             />
                         </FlexView>
                         <FlexView>
