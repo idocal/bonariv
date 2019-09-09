@@ -114,7 +114,7 @@ export default class ChatWindow extends Component {
     state = {
         messages: [],
         currentMessage: "",
-        isInitial: true
+        isInitial: true,
     };
 
     componentDidMount() {
@@ -126,7 +126,7 @@ export default class ChatWindow extends Component {
     }
 
     async handleType(e) {
-        await this.setState({currentMessage: e.target.value})
+        await this.setState({currentMessage: e.target.value});
     }
 
     async handleSend() {
@@ -238,6 +238,7 @@ export default class ChatWindow extends Component {
                                    onChange={this.handleType}
                                    onKeyDown={this.keyPress}
                                    maxLength="150"
+                                   disabled={this.state.isInitial}
                             />
                         </FlexView>
                         <FlexView>
