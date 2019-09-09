@@ -66,11 +66,12 @@ io.on('connection', function(socket){
         const { userId, wing, name, avatar } = data;
         socket.userId = userId;
         activeConnections[userId] = socket;
-        console.log('Active connections now after req_partner:', Object.keys(activeConnections).length);
+        console.log('active now:', Object.keys(activeConnections).length);
         console.log(`Requesting partner for userId: ${userId}, ${wing}, ${name}`);
         lookForPartner(userId, wing, name, avatar);
     });
 
+    // New message
     socket.on('newMessage', function(data) {
         const { content, time, to } = data;
         console.log('newMessage', data);
@@ -79,9 +80,18 @@ io.on('connection', function(socket){
             // Think about what we want to do here
             return;
         }
-        activeConnections[to].emit('newMessage', { content, time, from: socket.userId });
+        activeConnections[to] && activeConnections[to].emit('newMessage', { content, time, from: socket.userId });
     });
-    
+
+    // Timeout
+    socket.on('chatTimeout', function() {
+        if (socket.userId && activeConnections[socket.userId]) {
+            const { activePartnerId } = activeConnections[socket.userId];
+            if (activePartnerId && activeConnections[activePartnerId]) {
+                activeConnections[activePartnerId].emit('partnerDisconnect', {});
+            }
+        }
+    });
 
     // Disconnect
     socket.on('disconnect', function() {
@@ -93,6 +103,7 @@ io.on('connection', function(socket){
             delete activeConnections[socket.userId];
         }
         console.log('disconnected userId:', socket.userId);
+        console.log('active now:', Object.keys(activeConnections).length);
     });
 });
 

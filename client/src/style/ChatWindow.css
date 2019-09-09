@@ -86,3 +86,8 @@
     color: #505862;
     margin-top: 5px;
 }
+
+.intro-counter span {
+    font-size: 32px;
+    font-weight: 700;
+}

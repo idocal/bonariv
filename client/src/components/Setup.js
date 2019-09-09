@@ -91,8 +91,8 @@ export default class Setup extends Component {
             <FlexView hAlignContent="center" column>
                 <Welcome />
                 <FlexView hAlignContent="center">
-                    <Button color="red" onClick={ () => {this.handleWingChoose('right')}}>ימין</Button>
-                    <Button color="blue" onClick={ () => {this.handleWingChoose('left')}}>שמאל</Button>
+                    <Button color="red" onClick={ () => {this.handleWingChoose('right')}} style={{width: "80px"}}>ימין</Button>
+                    <Button color="blue" onClick={ () => {this.handleWingChoose('left')}} style={{width: "80px"}}>שמאל</Button>
                 </FlexView>
             </FlexView>;
 
