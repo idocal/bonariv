@@ -61,3 +61,17 @@
     margin-left: 15px;
     padding-top: 5px;
 }
+
+.intro {
+    height: 100%;
+}
+
+.intro-pic img {
+    border-radius: 50%;
+}
+
+.intro h1 {
+    font-size: 24px;
+    color: #505862;
+    margin-top: 5px;
+}

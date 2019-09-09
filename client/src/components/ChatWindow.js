@@ -40,6 +40,23 @@ function Message(props) {
     )
 }
 
+function Intro(props) {
+    return (
+        <FlexView column className="intro" vAlignContent="center" hAlignContent="center">
+            <FlexView className="intro-pic">
+                {
+                    props.avatar !== undefined ?
+                        (<img src={"/avatars/" + props.avatar + ".png"} alt={props.avatar} />) :
+                        (<img src={"/avatars/default.png"} alt={props.user} />)
+                }
+            </FlexView>
+            <FlexView>
+                <h1>{ props.name }</h1>
+            </FlexView>
+        </FlexView>
+    )
+}
+
 export default class ChatWindow extends Component {
 
     constructor(props) {
@@ -47,7 +64,6 @@ export default class ChatWindow extends Component {
         this.handleType = this.handleType.bind(this);
         this.handleSend = this.handleSend.bind(this);
         this.handleIncoming = this.handleIncoming.bind(this);
-        this.messagesRef = React.createRef();
     }
 
     state = {
@@ -112,18 +128,20 @@ export default class ChatWindow extends Component {
             <FlexView className="chat-window" column>
                 <FlexView className="messages" column>
                     {
-                        this.state.messages.map((message, i) => {
-                            let userName = message.local ? this.props.user : this.props.partnerName;
-                            let avatar = message.local ? this.props.userAvatar : this.props.partnerAvatar;
-                            return (
-                                <Message content={message.content}
-                                         user={userName}
-                                         time={message.time}
-                                         avatar={avatar}
-                                         key={i}
-                                />
-                            )
-                        })
+                        !this.state.messages.length ?
+                            <Intro name={this.props.partnerName} avatar={this.props.partnerAvatar} /> :
+                            this.state.messages.map((message, i) => {
+                                let userName = message.local ? this.props.user : this.props.partnerName;
+                                let avatar = message.local ? this.props.userAvatar : this.props.partnerAvatar;
+                                return (
+                                    <Message content={message.content}
+                                             user={userName}
+                                             time={message.time}
+                                             avatar={avatar}
+                                             key={i}
+                                    />
+                                )
+                            })
                     }
                     <div style={{ float:"left", clear: "both" }}
                          ref={(el) => { this.messagesEnd = el; }}>

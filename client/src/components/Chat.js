@@ -28,7 +28,6 @@ export default class Chat extends Component {
         if (isValid) {
             // Found match
             this.state.socket.on('partner', match => {
-                console.log('found partner:', match);
                 this.setState({
                     loading: false,
                     convId: match.convId,
