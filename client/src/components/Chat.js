@@ -19,7 +19,7 @@ export default class Chat extends Component {
 
     constructor(props) {
         super(props);
-        this.state.socket = socketIOClient('/');
+        this.state.socket = socketIOClient('http://localhost:8080');
     }
 
     componentDidMount() {

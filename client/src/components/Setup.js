@@ -12,6 +12,16 @@ const randomNames = wing => {
 };
 const yourNameTag = "השם שלך: ";
 
+function Welcome() {
+    return (
+        <FlexView hAlignContent="center" className="welcome" column>
+            <h1>ברוכים הבאים ל״בוא נריב״</h1>
+            <p>בוחרים ימין או שמאל, מוסיפים שם ותמונה ומתחילים לדבר עם הצד השני!</p>
+            <p className="disclaimer">מוזמנים להתווכח, לטעון, אבל הכי חשוב, לזכור שבצד השני נמצא בן אדם בדיוק כמוכם שבסך הכל חושב קצת אחרת :)</p>
+        </FlexView>
+    )
+}
+
 export default class Setup extends Component {
 
     state = {
@@ -79,6 +89,7 @@ export default class Setup extends Component {
 
         let chooseWing =
             <FlexView hAlignContent="center" column>
+                <Welcome />
                 <FlexView hAlignContent="center">
                     <Button color="red" onClick={ () => {this.handleWingChoose('right')}}>ימין</Button>
                     <Button color="blue" onClick={ () => {this.handleWingChoose('left')}}>שמאל</Button>
