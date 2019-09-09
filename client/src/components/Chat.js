@@ -46,7 +46,7 @@ export default class Chat extends Component {
                     partnerName: "",
                     partnerAvatar: ""
                 });
-                this.getChatPartner();
+                setTimeout(() => {this.getChatPartner();}, 2000);
             });
 
             this.getChatPartner()
