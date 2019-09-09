@@ -12,9 +12,20 @@
     background: #FFF;
 }
 
+.chat-counter span {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
 .messages {
     height: calc(100% - 50px);
     overflow-y: auto;
+}
+
+.vs h2 {
+    font-size: 18px;
+    color: #505862;
+    margin: 10px 0;
 }
 
 .type-message {

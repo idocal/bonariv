@@ -6,6 +6,7 @@
     "moment": "^2.24.0",
     "react": "^16.9.0",
     "react-chat-widget": "^2.1.4-1",
+    "react-countdown-now": "^2.1.1",
     "react-dom": "^16.9.0",
     "react-flexview": "^4.0.3",
     "react-router-dom": "^5.0.1",

@@ -3,6 +3,7 @@ import FlexView from "react-flexview/";
 import '../style/ChatWindow.css';
 import { Input, Button } from 'semantic-ui-react'
 import moment from 'moment';
+import Countdown from 'react-countdown-now';
 
 function Message(props) {
     return (
@@ -28,7 +29,7 @@ function Message(props) {
                         </FlexView>
                     </FlexView>
                     <FlexView className="content">
-                        <span style={{wordBreak: "break-all"}}>
+                        <span style={{wordBreak: "break-all", wordWrap: "break-word"}}>
                             { props.content }
                         </span>
                     </FlexView>
@@ -40,21 +41,64 @@ function Message(props) {
     )
 }
 
-function Intro(props) {
-    return (
-        <FlexView column className="intro" vAlignContent="center" hAlignContent="center">
-            <FlexView className="intro-pic">
+class Intro extends Component {
+
+    componentDidMount() {
+        setTimeout(() => this.setState({isInitial: false}), 2000);
+    }
+
+    state = {
+        isInitial: true
+    };
+
+    render() {
+        return (
+            <FlexView column height="100%" width="100%" vAlignContent="center" hAlignContent="center">
                 {
-                    props.avatar !== undefined ?
-                        (<img src={"/avatars/" + props.avatar + ".png"} alt={props.avatar} />) :
-                        (<img src={"/avatars/default.png"} alt={props.user} />)
+                    !!this.state.isInitial ? (
+                        <FlexView column className="intro" vAlignContent="center" hAlignContent="center">
+                            <FlexView className="intro-pic">
+                                {
+                                    this.props.userAvatar !== undefined ?
+                                        (<img src={"/avatars/" + this.props.userAvatar + ".png"} alt={this.props.userName} />) :
+                                        (<img src={"/avatars/default.png"} alt={this.props.userName} />)
+                                }
+                            </FlexView>
+                            <FlexView>
+                                <h1>{ this.props.userName }</h1>
+                            </FlexView>
+
+                            <FlexView className="vs" >
+                                <h2>VS</h2>
+                            </FlexView>
+
+                            <FlexView className="intro-pic">
+                                {
+                                    this.props.partnerAvatar !== undefined ?
+                                        (<img src={"/avatars/" + this.props.partnerAvatar + ".png"} alt={this.props.partnerName} />) :
+                                        (<img src={"/avatars/default.png"} alt={this.props.partnerName} />)
+                                }
+                            </FlexView>
+                            <FlexView>
+                                <h1>{ this.props.partnerName }</h1>
+                            </FlexView>
+                        </FlexView>
+                    ) : (
+                        <FlexView className="intro-counter">
+                            <Countdown date={Date.now() + 3000} renderer={
+                                ({ hours, minutes, seconds, completed }) => {
+                                    return (
+                                        <span>{seconds}</span>
+                                    )
+                                }
+                            } />
+                        </FlexView>
+                    )
                 }
             </FlexView>
-            <FlexView>
-                <h1>{ props.name }</h1>
-            </FlexView>
-        </FlexView>
-    )
+        )
+    }
+
 }
 
 export default class ChatWindow extends Component {
@@ -64,11 +108,13 @@ export default class ChatWindow extends Component {
         this.handleType = this.handleType.bind(this);
         this.handleSend = this.handleSend.bind(this);
         this.handleIncoming = this.handleIncoming.bind(this);
+        this.keyPress = this.keyPress.bind(this);
     }
 
     state = {
         messages: [],
-        currentMessage: ""
+        currentMessage: "",
+        isInitial: true
     };
 
     componentDidMount() {
@@ -76,6 +122,7 @@ export default class ChatWindow extends Component {
         socket.on('newMessage', async message => {
             await this.handleIncoming(message);
         });
+        setTimeout(() => this.setState({isInitial: false, startTime: Date.now()}), 5000);
     }
 
     async handleType(e) {
@@ -120,46 +167,82 @@ export default class ChatWindow extends Component {
     }
 
     scrollToBottom() {
-        this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+        if (this.messagesEnd) {
+            this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+        }
+    }
+
+    async keyPress(e) {
+        if (!!this.state.currentMessage.length && !this.state.isInitial) {
+            if (e.keyCode === 13) {
+                console.log('Enter');
+                await this.handleSend();
+            }
+        }
     }
 
     render() {
         return (
-            <FlexView className="chat-window" column>
-                <FlexView className="messages" column>
-                    {
-                        !this.state.messages.length ?
-                            <Intro name={this.props.partnerName} avatar={this.props.partnerAvatar} /> :
-                            this.state.messages.map((message, i) => {
-                                let userName = message.local ? this.props.user : this.props.partnerName;
-                                let avatar = message.local ? this.props.userAvatar : this.props.partnerAvatar;
-                                return (
-                                    <Message content={message.content}
-                                             user={userName}
-                                             time={message.time}
-                                             avatar={avatar}
-                                             key={i}
-                                    />
-                                )
-                            })
-                    }
-                    <div style={{ float:"left", clear: "both" }}
-                         ref={(el) => { this.messagesEnd = el; }}>
-                    </div>
-                </FlexView>
-                <FlexView className="type-message">
-                    <FlexView grow>
-                        <Input className="message-input"
-                               placeholder="הקלד/י הודעה..."
-                               value={this.state.currentMessage}
-                               onChange={this.handleType}
-                        />
+            <FlexView column width="100%" vAlignContent="center" hAlignContent="center">
+                {
+                    !this.state.isInitial && (
+                        <FlexView className="chat-counter">
+                            <Countdown date={this.state.startTime + 5 *60*1000} renderer={
+                                ({ hours, minutes, seconds, completed }) => {
+                                    if (parseInt(seconds) < 10) {
+                                        seconds = "0" + seconds
+                                    }
+                                    return (
+                                        <span>{minutes + ":" + seconds}</span>
+                                    )
+                                }
+                            } />
+                        </FlexView>
+                    )
+                }
+
+                <FlexView className="chat-window" column>
+                    <FlexView className="messages" column>
+                        {
+                            this.state.isInitial ?
+                                <Intro partnerName={this.props.partnerName}
+                                       partnerAvatar={this.props.partnerAvatar}
+                                       userName={this.props.user}
+                                       userAvatar={this.props.userAvatar}
+                                /> :
+                                this.state.messages.map((message, i) => {
+                                    let userName = message.local ? this.props.user : this.props.partnerName;
+                                    let avatar = message.local ? this.props.userAvatar : this.props.partnerAvatar;
+                                    return (
+                                        <Message content={message.content}
+                                                 user={userName}
+                                                 time={message.time}
+                                                 avatar={avatar}
+                                                 key={i}
+                                        />
+                                    )
+                                })
+                        }
+                        <div style={{ float:"left", clear: "both" }}
+                             ref={(el) => { this.messagesEnd = el; }}>
+                        </div>
                     </FlexView>
-                    <FlexView>
-                        <Button color="red" onClick={this.handleSend} disabled={!this.state.currentMessage.length}>שלח</Button>
+                    <FlexView className="type-message">
+                        <FlexView grow>
+                            <Input className="message-input"
+                                   placeholder="הקלד/י הודעה..."
+                                   value={this.state.currentMessage}
+                                   onChange={this.handleType}
+                                   onKeyDown={this.keyPress}
+                            />
+                        </FlexView>
+                        <FlexView>
+                            <Button color="red" onClick={this.handleSend} disabled={!this.state.currentMessage.length || this.state.isInitial}>שלח</Button>
+                        </FlexView>
                     </FlexView>
                 </FlexView>
             </FlexView>
+
         )
     }
 }
