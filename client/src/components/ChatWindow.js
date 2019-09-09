@@ -47,6 +47,7 @@ export default class ChatWindow extends Component {
         this.handleType = this.handleType.bind(this);
         this.handleSend = this.handleSend.bind(this);
         this.handleIncoming = this.handleIncoming.bind(this);
+        this.messagesRef = React.createRef();
     }
 
     state = {
@@ -82,7 +83,9 @@ export default class ChatWindow extends Component {
                 messages,
                 currentMessage: ""
             }
+
         });
+        this.scrollToBottom();
         this.props.socket.emit('newMessage', {content, time: time.format(), to})
     }
 
@@ -97,6 +100,11 @@ export default class ChatWindow extends Component {
             messages.push(message);
             return {messages}
         });
+        this.scrollToBottom();
+    }
+
+    scrollToBottom() {
+        this.messagesEnd.scrollIntoView({ behavior: "smooth" });
     }
 
     render() {
@@ -117,6 +125,9 @@ export default class ChatWindow extends Component {
                             )
                         })
                     }
+                    <div style={{ float:"left", clear: "both" }}
+                         ref={(el) => { this.messagesEnd = el; }}>
+                    </div>
                 </FlexView>
                 <FlexView className="type-message">
                     <FlexView grow>
