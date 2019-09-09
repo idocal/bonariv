@@ -6,6 +6,7 @@ import Loading from './Loading';
 import socketIOClient from "socket.io-client";
 import ChatWindow from "./ChatWindow";
 
+const HOST = "/";
 
 export default class Chat extends Component {
     state = {
@@ -19,7 +20,7 @@ export default class Chat extends Component {
 
     constructor(props) {
         super(props);
-        this.state.socket = socketIOClient('/');
+        this.state.socket = socketIOClient(HOST);
     }
 
     componentDidMount() {
@@ -49,7 +50,7 @@ export default class Chat extends Component {
                 setTimeout(() => {this.getChatPartner();}, 2000);
             });
 
-            this.getChatPartner()
+            this.getChatPartner();
         } else {
             this.props.history.push("/");
         }
