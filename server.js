@@ -27,24 +27,33 @@ const lookForPartner = (userId, wing, name, avatar) => {
     }
     console.log('Found match!');
     const convId = short.generate();
-    const matchedUser = queueForSearch.pop();
+    const matchedUser = queueForSearch.splice(Math.floor(Math.random()*queueForSearch.length), 1)[0];
 
-    activeConnections[matchedUser.userId].emit('partner', {
-        convId,
-        partnerId: userId,
-        partnerName: name,
-        partnerAvatar: avatar
-    });
+    if (activeConnections[matchedUser.userId] && activeConnections[userId]) {
+        activeConnections[matchedUser.userId].emit('partner', {
+            convId,
+            partnerId: userId,
+            partnerName: name,
+            partnerAvatar: avatar
+        });
 
-    activeConnections[userId].emit('partner', {
-        convId,
-        partnerId: matchedUser.userId,
-        partnerName: matchedUser.name,
-        partnerAvatar: matchedUser.avatar
-    });
+        activeConnections[userId].emit('partner', {
+            convId,
+            partnerId: matchedUser.userId,
+            partnerName: matchedUser.name,
+            partnerAvatar: matchedUser.avatar
+        });
 
-    activeConnections[matchedUser.userId].activePartnerId = userId;
-    activeConnections[userId].activePartnerId = matchedUser.userId;
+        activeConnections[matchedUser.userId].activePartnerId = userId;
+        activeConnections[userId].activePartnerId = matchedUser.userId;
+    }
+
+    else {
+        if (activeConnections[userId]) {
+            lookForPartner(userId, wing, name, avatar)
+        }
+
+    }
 };
 
 // Manage socket connections
