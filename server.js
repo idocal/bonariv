@@ -27,7 +27,8 @@ const lookForPartner = (userId, wing, name, avatar) => {
     }
     console.log('Found match!');
     const convId = short.generate();
-    const matchedUser = queueForSearch.splice(Math.floor(Math.random()*queueForSearch.length), 1)[0];
+    // const matchedUser = queueForSearch.splice(Math.floor(Math.random()*queueForSearch.length), 1)[0];
+    const matchedUser = queueForSearch.shift();
 
     if (activeConnections[matchedUser.userId] && activeConnections[userId]) {
         activeConnections[matchedUser.userId].emit('partner', {
@@ -90,6 +91,7 @@ io.on('connection', function(socket){
             if (activePartnerId && activeConnections[activePartnerId]) {
                 activeConnections[activePartnerId].emit('partnerDisconnect', {});
             }
+            activeConnections[socket.userId].emit('partnerDisconnect', {});
         }
     });
 
