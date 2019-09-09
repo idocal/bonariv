@@ -105,7 +105,7 @@ export default class Setup extends Component {
         let nameInput =
             <FlexView column>
                 <FlexView hAlignContent="center">
-                    <Input placeholder='בחר/י שם...' onChange={this.handleChange} value={this.state.inputValue}/>
+                    <Input maxLength="25" placeholder='בחר/י שם...' onChange={this.handleChange} value={this.state.inputValue} />
                     <Button color="blue" onClick={this.handleRandomNameButton}>רנדום</Button>
                 </FlexView>
 
@@ -146,7 +146,7 @@ export default class Setup extends Component {
         return (
             <FlexView column>
                 { this.state.stage === 'intro' && chooseWing }
-                { this.state.stage === 'name' && this.state.name && nameTag }
+                { this.state.stage === 'name' && nameTag }
                 { this.state.stage === 'name' && nameInput }
                 { this.state.stage === 'avatar' && chooseAvatar }
             </FlexView>

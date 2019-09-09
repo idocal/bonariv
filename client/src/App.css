@@ -39,6 +39,7 @@ body {
 .your-name-tag h1 {
   font-size: 32px;
   margin: 0;
+  height: 45px;
 }
 
 .your-name-tag h2 {
