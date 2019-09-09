@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/bigquery": "^4.2.0",
     "better-queue": "^3.8.10",
     "body-parser": "^1.19.0",
     "eslint": "^6.3.0",

@@ -7,6 +7,7 @@ const port = process.env.PORT || 5000;
 const uuid = require('uuid');
 const short = require('short-uuid');
 const bodyParser = require('body-parser');
+const writeToBq = require('./write-to-bq')
 
 const qRight = [];
 const qLeft = [];
@@ -47,6 +48,8 @@ const lookForPartner = (userId, wing, name, avatar) => {
 
         activeConnections[matchedUser.userId].activePartnerId = userId;
         activeConnections[userId].activePartnerId = matchedUser.userId;
+        activeConnections[matchedUser.userId].convId = convId;
+        activeConnections[userId].convId = convId;
     }
 
     else {
@@ -66,6 +69,8 @@ io.on('connection', function(socket){
         console.log('requesting partner with data:', data);
         const { userId, wing, name, avatar } = data;
         socket.userId = userId;
+        socket.userWing = wing;
+        socket.userAvatar = avatar;
         activeConnections[userId] = socket;
         console.log('active now:', Object.keys(activeConnections).length);
         console.log(`Requesting partner for userId: ${userId}, ${wing}, ${name}`);
@@ -75,6 +80,15 @@ io.on('connection', function(socket){
     // New message
     socket.on('newMessage', function(data) {
         const { content, time, to } = data;
+        writeToBq({
+            action: 'newMessage',
+            user_id: socket.userId,
+            partner_id: to,
+            entry: content,
+            wing: socket.userWing,
+            avatar: socket.userAvatar,
+            conv_id: socket.convId,
+        })
         console.log('newMessage', data);
         if (!activeConnections[to] || !activeConnections[to].emit) {
             console.log('Try to connect dead user');
