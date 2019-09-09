@@ -7,7 +7,7 @@ const port = process.env.PORT || 5000;
 const uuid = require('uuid');
 const short = require('short-uuid');
 const bodyParser = require('body-parser');
-const writeToBq = require('./write-to-bq')
+const writeToBq = require('./write-to-bq');
 
 const qRight = [];
 const qLeft = [];
@@ -147,6 +147,10 @@ app.get('/ping', (req, res) => {
 });
 
 app.use(express.static(path.join(__dirname, 'client', 'build')));
+
+app.get('*', function(req, res) {
+    res.redirect('/');
+});
 
 if (module === require.main) {
     const PORT = process.env.PORT || 8080;
