@@ -34,7 +34,7 @@
 .message {
     padding: 5px 10px 5px 10px;
     color: #6E7379;
-    height: 50px;
+    min-height: 50px;
 }
 
 .message .sender {
@@ -49,4 +49,15 @@
 
 .message .sender .time {
     color: #B2B9C1;
+}
+
+.message .pic img {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+}
+
+.message .pic {
+    margin-left: 15px;
+    padding-top: 5px;
 }

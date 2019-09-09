@@ -13,24 +13,35 @@ const qLeft = [];
 
 const activeConnections = {};
 
-const lookForPartner = (userId, wing, name) => {
+const lookForPartner = (userId, wing, name, avatar) => {
     console.log('new user looking for partner');
-    const isLeft = wing !== 'right'
+    const isLeft = wing !== 'right';
     const queueForSearch = isLeft ? qRight : qLeft;
     const queueForStandBy = !isLeft ? qRight : qLeft;
 
 
     if (!queueForSearch.length) {
-        console.log(`Dont have any partner for userId: ${userId}, write to queue: ${wing}`)
-        queueForStandBy.push({userId, name});
+        console.log(`Dont have any partner for userId: ${userId}, write to queue: ${wing}`);
+        queueForStandBy.push({userId, name, avatar});
         return;
     }
     console.log('Found match!');
     const convId = short.generate();
     const matchedUser = queueForSearch.pop();
 
-    activeConnections[matchedUser.userId].emit('partner', { convId, partnerId: userId, partnerName: name });
-    activeConnections[userId].emit('partner', { convId, partnerId: matchedUser.userId, partnerName: matchedUser.name });
+    activeConnections[matchedUser.userId].emit('partner', {
+        convId,
+        partnerId: userId,
+        partnerName: name,
+        partnerAvatar: avatar
+    });
+
+    activeConnections[userId].emit('partner', {
+        convId,
+        partnerId: matchedUser.userId,
+        partnerName: matchedUser.name,
+        partnerAvatar: matchedUser.avatar
+    });
 
     activeConnections[matchedUser.userId].activePartnerId = userId;
     activeConnections[userId].activePartnerId = matchedUser.userId;
@@ -42,18 +53,18 @@ io.on('connection', function(socket){
 
     // Look for a partner
     socket.on('req_partner', function(data) {
-        console.log('data', data)
-        const { userId, wing, name } = data;
+        console.log('requesting partner with data:', data);
+        const { userId, wing, name, avatar } = data;
         socket.userId = userId;
         activeConnections[userId] = socket;
         console.log('Active connections now after req_partner:', Object.keys(activeConnections).length);
         console.log(`Requesting partner for userId: ${userId}, ${wing}, ${name}`);
-        lookForPartner(userId, wing, name);
+        lookForPartner(userId, wing, name, avatar);
     });
 
     socket.on('newMessage', function(data) {
         const { content, time, to } = data;
-        console.log('newMessage', data)
+        console.log('newMessage', data);
         if (!activeConnections[to] || !activeConnections[to].emit) {
             console.log('Try to connect dead user');
             // Think about what we want to do here

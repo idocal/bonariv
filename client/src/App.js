@@ -13,7 +13,6 @@ export default class App extends Component {
         const response = await fetch('/ping');
         const body = await response.json();
 
-        console.log(body);
         await this.setState({userId: body.userId});
 
         if (response.status !== 200) {

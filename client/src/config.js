@@ -32,3 +32,16 @@ export const nicknames = {
         "0מולן קיצון"
     ]
 };
+
+export const avatars = [
+    "barak",
+    "bennett",
+    "bibi",
+    "shafir",
+    "feiglin",
+    "danon",
+    "gantz",
+    "lapid",
+    "regev",
+    "peretz",
+];

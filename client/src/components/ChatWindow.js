@@ -7,20 +7,31 @@ import moment from 'moment';
 function Message(props) {
     return (
         <div className="message">
-            <FlexView className="sender" vAlignContent="center">
-                <FlexView className="user" vAlignContent="center">
-                    { props.user }
+            <FlexView>
+                <div className="pic">
+                    <img src={"/avatars/" + props.avatar + ".png"} alt={props.avatar} />
+                </div>
+
+                <FlexView column>
+                    <FlexView className="sender" vAlignContent="center">
+
+                        <FlexView className="user" vAlignContent="center">
+                            { props.user }
+                        </FlexView>
+
+                        <FlexView className="time" vAlignContent="center">
+                            { props.time.format("HH:mm") }
+                        </FlexView>
+                    </FlexView>
+                    <FlexView className="content">
+                        <span style={{wordBreak: "break-all"}}>
+                            { props.content }
+                        </span>
+                    </FlexView>
                 </FlexView>
-                <FlexView className="time" vAlignContent="center">
-                    { props.time.format("HH:mm") }
-                </FlexView>
-            </FlexView>
-            <FlexView className="content">
-                <span style={{wordBreak: "break-all"}}>
-                    { props.content }
-                </span>
 
             </FlexView>
+
         </div>
     )
 }
@@ -91,10 +102,12 @@ export default class ChatWindow extends Component {
                     {
                         this.state.messages.map((message, i) => {
                             let userName = message.local ? this.props.user : this.props.partnerName;
+                            let avatar = message.local ? this.props.userAvatar : this.props.partnerAvatar;
                             return (
                                 <Message content={message.content}
                                          user={userName}
                                          time={message.time}
+                                         avatar={avatar}
                                          key={i}
                                 />
                             )

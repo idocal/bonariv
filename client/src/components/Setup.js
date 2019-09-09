@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Button } from 'semantic-ui-react'
 import FlexView from "react-flexview";
-import { nicknames } from "../config";
+import { nicknames, avatars } from "../config";
 
 const randomNames = wing => {
     if (wing === 'right') {
@@ -17,8 +17,9 @@ export default class Setup extends Component {
     state = {
         name: "",
         inputValue: "",
-        isInitial: true,
-        wing: ""
+        stage: "intro",
+        wing: "",
+        avatar: ""
     };
 
     constructor(props) {
@@ -27,6 +28,8 @@ export default class Setup extends Component {
         this.handleNameButton = this.handleNameButton.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleWingChoose = this.handleWingChoose.bind(this);
+        this.handleAvatarClick = this.handleAvatarClick.bind(this);
+        this.handleAvatarChoose = this.handleAvatarChoose.bind(this);
     }
 
     async handleRandomNameButton() {
@@ -46,18 +49,30 @@ export default class Setup extends Component {
     }
 
     async handleNameButton() {
-        this.props.history.push('/chat', {
+        await this.setState({
             name: this.state.name,
-            wing: this.state.wing,
-            userId: this.props.userId
+            stage: "avatar"
         });
     }
 
     async handleWingChoose(wing) {
         await this.setState({
             wing: wing,
-            isInitial: false
+            stage: "name"
         });
+    }
+
+    async handleAvatarChoose(avatar) {
+        this.props.history.push('/chat', {
+            name: this.state.name,
+            wing: this.state.wing,
+            userId: this.props.userId,
+            avatar: this.state.avatar
+        });
+    }
+
+    handleAvatarClick(avatar) {
+        this.setState({ avatar });
     }
 
     render() {
@@ -93,13 +108,37 @@ export default class Setup extends Component {
                 </FlexView>
             </FlexView>;
 
+        let chooseAvatar =
+            <FlexView column>
+                <FlexView hAlignContent="center">
+                    <h1>בחר/י תמונה:</h1>
+                </FlexView>
+                <div className="avatars">
+                    {
+                        avatars.map((avatar, i) => {
+                            return (
+                                <div className="avatar" key={i} onClick={() => {this.handleAvatarClick(avatar)}}>
+                                    <img
+                                        src={"/avatars/" + avatar + ".png"}
+                                        className={this.state.avatar === avatar ? 'selected': ''}
+                                        alt={avatar} />
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+                <FlexView hAlignContent="center">
+                    <Button color="red" onClick={this.handleAvatarChoose} disabled={!this.state.avatar.length}>יאללה!</Button>
+                </FlexView>
+            </FlexView>;
+
         return (
             <FlexView column>
-                { !!this.state.isInitial && chooseWing }
-                { !this.state.isInitial && this.state.name && nameTag }
-                { !this.state.isInitial && nameInput }
+                { this.state.stage === 'intro' && chooseWing }
+                { this.state.stage === 'name' && this.state.name && nameTag }
+                { this.state.stage === 'name' && nameInput }
+                { this.state.stage === 'avatar' && chooseAvatar }
             </FlexView>
-
         )
     }
 }

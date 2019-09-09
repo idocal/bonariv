@@ -32,3 +32,31 @@ body {
   font-size: 16px;
   margin: 0;
 }
+
+.avatars {
+  margin: 10px 0;
+  text-align: center;
+}
+
+.avatar {
+  display: inline-block;
+}
+
+.avatar img {
+  border-radius: 50%;
+  transition: all .2s;
+  border: 2px solid white;
+  width: 64px;
+  height: 64px;
+  filter: grayscale(1);
+}
+
+.avatar img:hover, .avatar img.selected {
+  box-shadow: 3px 17px 22px -13px #7D85A8;
+  filter: none;
+}
+
+.avatar {
+  margin: 10px;
+  cursor: pointer;
+}

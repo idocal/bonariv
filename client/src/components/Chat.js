@@ -13,12 +13,13 @@ export default class Chat extends Component {
         convId: "",
         partnerId: "",
         partnerName: "",
+        partnerAvatar: "",
         socket: {}
     };
 
     constructor(props) {
         super(props);
-        this.state.socket = socketIOClient('/');
+        this.state.socket = socketIOClient('http://localhost:8080');
     }
 
     componentDidMount() {
@@ -27,11 +28,13 @@ export default class Chat extends Component {
         if (isValid) {
             // Found match
             this.state.socket.on('partner', match => {
+                console.log('found partner:', match);
                 this.setState({
                     loading: false,
                     convId: match.convId,
                     partnerName: match.partnerName,
                     partnerId: match.partnerId,
+                    partnerAvatar: match.partnerAvatar
                 });
             });
 
@@ -42,6 +45,7 @@ export default class Chat extends Component {
                     convId: "",
                     partnerId: "",
                     partnerName: "",
+                    partnerAvatar: ""
                 });
                 this.getChatPartner();
             });
@@ -54,7 +58,7 @@ export default class Chat extends Component {
 
     getChatPartner() {
         let props = this.props.location.state;
-        this.state.socket.emit('req_partner', { userId: props.userId, wing: props.wing, name: props.name });
+        this.state.socket.emit('req_partner', { ...props });
     }
 
     render() {
@@ -68,8 +72,10 @@ export default class Chat extends Component {
                         !this.state.loading &&  (
                             <ChatWindow
                                 user={this.props.location.state.name}
+                                userAvatar={this.props.location.state.avatar}
                                 partnerName={this.state.partnerName}
                                 partnerId={this.state.partnerId}
+                                partnerAvatar={this.state.partnerAvatar}
                                 socket={this.state.socket}
                             />
                         )
