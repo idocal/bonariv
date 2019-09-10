@@ -144,11 +144,16 @@ export default class Setup extends Component {
             </FlexView>;
 
         return (
-            <FlexView column>
-                { this.state.stage === 'intro' && chooseWing }
-                { this.state.stage === 'name' && nameTag }
-                { this.state.stage === 'name' && nameInput }
-                { this.state.stage === 'avatar' && chooseAvatar }
+            <FlexView column style={{height: "100%"}}>
+                <FlexView column grow vAlignContent="center">
+                    { this.state.stage === 'intro' && chooseWing }
+                    { this.state.stage === 'name' && nameTag }
+                    { this.state.stage === 'name' && nameInput }
+                    { this.state.stage === 'avatar' && chooseAvatar }
+                </FlexView>
+                <FlexView style={{"height": "40px"}} hAlignContent="center" className="copyright">
+                    <span>Made by <a href="mailto:calman.ido@gmail.com">Ido Calman</a></span>
+                </FlexView>
             </FlexView>
         )
     }

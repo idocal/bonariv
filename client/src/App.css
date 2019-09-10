@@ -74,3 +74,7 @@ body {
   margin: 10px;
   cursor: pointer;
 }
+
+.copyright span  {
+  font-size: 10px;
+}

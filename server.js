@@ -68,6 +68,15 @@ io.on('connection', function(socket){
     socket.on('req_partner', function(data) {
         console.log('requesting partner with data:', data);
         const { userId, wing, name, avatar } = data;
+        writeToBq({
+            action: 'requestPartner',
+            user_id: userId,
+            partner_id: null,
+            entry: null,
+            wing: wing,
+            avatar: avatar,
+            conv_id: null,
+        });
         socket.userId = userId;
         socket.userWing = wing;
         socket.userAvatar = avatar;
@@ -88,7 +97,7 @@ io.on('connection', function(socket){
             wing: socket.userWing,
             avatar: socket.userAvatar,
             conv_id: socket.convId,
-        })
+        });
         console.log('newMessage', data);
         if (!activeConnections[to] || !activeConnections[to].emit) {
             console.log('Try to connect dead user');
@@ -143,7 +152,12 @@ app.get('/ping', (req, res) => {
     }
 
     // Create userId and return
-    res.send({"success": true, "userId": short.generate()});
+    let userId = short.generate();
+    writeToBq({
+        action: 'ping',
+        user_id: userId,
+    });
+    res.send({"success": true, "userId": userId});
 });
 
 app.use(express.static(path.join(__dirname, 'client', 'build')));

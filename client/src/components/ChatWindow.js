@@ -175,7 +175,6 @@ export default class ChatWindow extends Component {
     async keyPress(e) {
         if (!!this.state.currentMessage.length && !this.state.isInitial) {
             if (e.keyCode === 13) {
-                console.log('Enter');
                 await this.handleSend();
             }
         }
