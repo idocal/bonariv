@@ -186,7 +186,7 @@ export default class ChatWindow extends Component {
                 {
                     !this.state.isInitial && (
                         <FlexView className="chat-counter">
-                            <Countdown date={this.state.startTime + 5 *60*1000} renderer={
+                            <Countdown date={this.state.startTime + 10 *60*1000} renderer={
                                 ({ hours, minutes, seconds, completed }) => {
                                     if (completed) {
                                         this.props.socket.emit('chatTimeout');

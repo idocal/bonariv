@@ -26,10 +26,18 @@ const lookForPartner = (userId, wing, name, avatar) => {
         queueForStandBy.push({userId, name, avatar});
         return;
     }
-    console.log('Found match!');
+
     const convId = short.generate();
     // const matchedUser = queueForSearch.splice(Math.floor(Math.random()*queueForSearch.length), 1)[0];
     const matchedUser = queueForSearch.shift();
+
+    console.log('Found match!');
+    writeToBq({
+        action: 'match',
+        user_id: userId,
+        partner_id: matchedUser.userId,
+        conv_id: convId,
+    });
 
     if (activeConnections[matchedUser.userId] && activeConnections[userId]) {
         activeConnections[matchedUser.userId].emit('partner', {
@@ -76,6 +84,7 @@ io.on('connection', function(socket){
             wing: wing,
             avatar: avatar,
             conv_id: null,
+            user_name: name,
         });
         socket.userId = userId;
         socket.userWing = wing;
@@ -136,6 +145,8 @@ app.use(bodyParser.json());
 
 app.get('/ping', (req, res) => {
     // Cookie handler
+    let user_uuid = uuid.v4();
+    let ip = null;
     if (req.headers.cookie) {
         let dict = {};
         let rc = req.headers.cookie;
@@ -144,11 +155,13 @@ app.get('/ping', (req, res) => {
             dict[parts.shift().trim()] = decodeURI(parts.join('='));
         });
         if (!dict.uuid) {
-            res.cookie('uuid', uuid.v4(), { maxAge: 900000, httpOnly: false});
+            res.cookie('uuid', user_uuid, { maxAge: 900000, httpOnly: false});
+        } else {
+            user_uuid = dict.uuid;
         }
     }
     if (!req.headers.cookie) {
-        res.cookie('uuid', uuid.v4(), { maxAge: 900000, httpOnly: false});
+        res.cookie('uuid', user_uuid, { maxAge: 900000, httpOnly: false});
     }
 
     // Create userId and return
@@ -156,6 +169,9 @@ app.get('/ping', (req, res) => {
     writeToBq({
         action: 'ping',
         user_id: userId,
+        uuid: user_uuid,
+        ip: !!req.headers ? req.headers['x-forwarded-for'] : null,
+        user_agent: !!req.headers ? req.headers['user-agent'] : null
     });
     res.send({"success": true, "userId": userId});
 });

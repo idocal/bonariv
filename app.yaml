@@ -6,13 +6,13 @@ env: flex
 # consistently with multiple users. To work across multiple instances, an
 # extra-instance messaging system or data store would be needed.
 resources:
-  cpu: 2
-  memory_gb: 8
+  cpu: 4
+  memory_gb: 16
   disk_size_gb: 10
 
 automatic_scaling:
-  min_num_instances: 2
-  max_num_instances: 6
+  min_num_instances: 1
+  max_num_instances: 3
 
 network:
   session_affinity: true
