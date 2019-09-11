@@ -108,6 +108,7 @@ export default class ChatWindow extends Component {
         this.handleType = this.handleType.bind(this);
         this.handleSend = this.handleSend.bind(this);
         this.handleIncoming = this.handleIncoming.bind(this);
+        this.handleNext = this.handleNext.bind(this);
         this.keyPress = this.keyPress.bind(this);
     }
 
@@ -127,6 +128,10 @@ export default class ChatWindow extends Component {
 
     async handleType(e) {
         await this.setState({currentMessage: e.target.value});
+    }
+    
+    async handleNext() {
+        this.props.socket.emit('nextPartner', {userId: this.props.userId, partnerId: this.props.partnerId})
     }
 
     async handleSend() {
@@ -185,20 +190,25 @@ export default class ChatWindow extends Component {
             <FlexView column width="100%" vAlignContent="center" hAlignContent="center">
                 {
                     !this.state.isInitial && (
-                        <FlexView className="chat-counter">
-                            <Countdown date={this.state.startTime + 10 *60*1000} renderer={
-                                ({ hours, minutes, seconds, completed }) => {
-                                    if (completed) {
-                                        this.props.socket.emit('chatTimeout');
+                        <FlexView className="chat-counter" vAlignContent="center" style={{marginBottom: "5px"}}>
+                            <FlexView grow hAlignContent="center">
+                                <Countdown date={this.state.startTime + 10 *60*1000} renderer={
+                                    ({ hours, minutes, seconds, completed }) => {
+                                        if (completed) {
+                                            this.props.socket.emit('chatTimeout');
+                                        }
+                                        if (parseInt(seconds) < 10) {
+                                            seconds = "0" + seconds
+                                        }
+                                        return (
+                                            <span>{minutes + ":" + seconds}</span>
+                                        )
                                     }
-                                    if (parseInt(seconds) < 10) {
-                                        seconds = "0" + seconds
-                                    }
-                                    return (
-                                        <span>{minutes + ":" + seconds}</span>
-                                    )
-                                }
-                            } />
+                                } />
+                            </FlexView>
+                            <FlexView>
+                                <Button color="teal" onClick={this.handleNext}>דפדף</Button>
+                            </FlexView>
                         </FlexView>
                     )
                 }

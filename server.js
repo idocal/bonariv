@@ -3,7 +3,6 @@ const path = require('path');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const port = process.env.PORT || 5000;
 const uuid = require('uuid');
 const short = require('short-uuid');
 const bodyParser = require('body-parser');
@@ -61,7 +60,7 @@ const lookForPartner = (userId, wing, name, avatar) => {
     }
 
     else {
-        if (activeConnections[userId]) {
+        if (!!activeConnections[userId]) {
             lookForPartner(userId, wing, name, avatar)
         }
 
@@ -93,6 +92,17 @@ io.on('connection', function(socket){
         console.log('active now:', Object.keys(activeConnections).length);
         console.log(`Requesting partner for userId: ${userId}, ${wing}, ${name}`);
         lookForPartner(userId, wing, name, avatar);
+    });
+
+    socket.on('nextPartner', function(data) {
+        const { userId, partnerId } = data;
+        console.log(`next from ${userId} to ${partnerId}`);
+        if (activeConnections[partnerId] && activeConnections[partnerId].activePartnerId === userId) {
+            setTimeout(() => {
+                activeConnections[partnerId].emit('partnerDisconnect');
+            }, 2000);
+        }
+        socket.emit('partnerDisconnect');
     });
 
     // New message

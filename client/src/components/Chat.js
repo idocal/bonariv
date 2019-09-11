@@ -39,8 +39,8 @@ export default class Chat extends Component {
             });
 
             // Partner disconnected - back to lobby
-            this.state.socket.on('partnerDisconnect', () => {
-                this.setState({
+            this.state.socket.on('partnerDisconnect', async () => {
+                await this.setState({
                     loading: true,
                     convId: "",
                     partnerId: "",
@@ -71,6 +71,7 @@ export default class Chat extends Component {
                     {
                         !this.state.loading &&  (
                             <ChatWindow
+                                userId={this.props.location.state.userId}
                                 user={this.props.location.state.name}
                                 userAvatar={this.props.location.state.avatar}
                                 partnerName={this.state.partnerName}
