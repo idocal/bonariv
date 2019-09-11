@@ -6,7 +6,7 @@ import Loading from './Loading';
 import socketIOClient from "socket.io-client";
 import ChatWindow from "./ChatWindow";
 
-const HOST = "/";
+const HOST = "http://192.168.1.100:8080";
 
 export default class Chat extends Component {
     state = {

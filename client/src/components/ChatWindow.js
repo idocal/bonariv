@@ -29,7 +29,7 @@ function Message(props) {
                         </FlexView>
                     </FlexView>
                     <FlexView className="content">
-                        <span style={{wordBreak: "break-all", wordWrap: "break-word"}}>
+                        <span style={{maxWidth: "100%", wordWrap: "break-word"}}>
                             { props.content }
                         </span>
                     </FlexView>
