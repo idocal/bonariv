@@ -41,7 +41,11 @@ export const avatars = [
     "feiglin",
     "danon",
     "gantz",
+    "bitan",
+    "shaked",
     "lapid",
+    "litzman",
     "regev",
+    "tibi",
     "peretz",
 ];

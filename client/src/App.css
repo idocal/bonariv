@@ -50,6 +50,7 @@ body {
 .avatars {
   margin: 10px 0;
   text-align: center;
+  max-width: 640px;
 }
 
 .avatar {

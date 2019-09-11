@@ -142,7 +142,9 @@ io.on('connection', function(socket){
         if (socket.userId && activeConnections[socket.userId]) {
             const { activePartnerId } = activeConnections[socket.userId];
             if (activePartnerId && activeConnections[activePartnerId]) {
-                activeConnections[activePartnerId].emit('partnerDisconnect', {});
+                if (activeConnections[activePartnerId].activePartnerId === socket.userId) {
+                    activeConnections[activePartnerId].emit('partnerDisconnect', {});
+                }
             }
             delete activeConnections[socket.userId];
         }
